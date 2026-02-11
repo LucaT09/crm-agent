@@ -1,0 +1,21 @@
+dataset: "market_prices_demo"
+commodities: ["Lithium", "Cobalt", "Nickel"]
+metrics: ["price_usd_t"]
+
+outputs:
+  - path: "exports/output.csv"
+    schema:
+      columns:
+        - {name: date, type: date}
+        - {name: commodity, type: string}
+        - {name: metric, type: string}
+        - {name: value, type: number}
+        - {name: unit, type: string}
+        - {name: source, type: string}
+        - {name: retrieved_at, type: datetime}
+
+quality_rules:
+  - rule: "no_nulls"
+    columns: ["date", "commodity", "metric", "value", "source"]
+  - rule: "row_count_min"
+    min_rows: 50
