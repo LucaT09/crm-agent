@@ -4,11 +4,13 @@ on:
   workflow_dispatch:
     inputs:
       run_id:
+        description: "Unique run id"
         required: true
-        type: string
+        default: "manual-test"
       spec_path:
+        description: "Path to spec yaml"
         required: true
-        type: string
+        default: "specs/example.yaml"
 
 run-name: run-${{ inputs.run_id }}
 
