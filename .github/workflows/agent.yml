@@ -1,0 +1,50 @@
+name: agent
+
+on:
+  workflow_dispatch:
+    inputs:
+      run_id:
+        required: true
+        type: string
+      spec_path:
+        required: true
+        type: string
+
+run-name: run-${{ inputs.run_id }}
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    env:
+      SPEC_PATH: ${{ inputs.spec_path }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install deps
+        run: pip install -r requirements.txt
+
+      - name: Run pipeline
+        run: python pipelines/run.py --spec "${{ inputs.spec_path }}" --out exports/output.csv
+
+      - name: Run tests
+        run: pytest -q --disable-warnings --maxfail=1
+
+      - name: Upload CSV
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: csv
+          path: exports/output.csv
+
+      - name: Upload failure context
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: failure_context
+          path: |
+            exports/
+            .pytest_cache/
